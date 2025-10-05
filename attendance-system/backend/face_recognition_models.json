@@ -1,0 +1,13 @@
+{
+  "available_models": [],
+  "model_descriptions": {
+    "mediapipe": "Google's MediaPipe face detection - Fast and lightweight",
+    "insightface": "State-of-the-art face recognition with high accuracy",
+    "dlib": "Traditional face recognition using HOG + Linear SVM",
+    "deepface_facenet": "FaceNet model via DeepFace - High accuracy",
+    "deepface_vgg-face": "VGG-Face model via DeepFace - Robust recognition",
+    "deepface_openface": "OpenFace model via DeepFace - Lightweight option"
+  },
+  "setup_date": "2025-09-24 15:02:51.522990",
+  "status": "initialized"
+}

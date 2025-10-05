@@ -1,0 +1,6 @@
+Attendance System Evaluation - 2025-10-04 08:34:06.720827
+==================================================
+Total Users: 11
+Face Registration Rate: 57.1%
+Verification Success Rate: 0.0%
+Overall Health Score: 40.1/100
