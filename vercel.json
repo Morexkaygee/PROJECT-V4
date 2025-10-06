@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "attendance-system/frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "attendance-system/frontend/$1"
+    }
+  ],
+  "buildCommand": "cd attendance-system/frontend && npm run build",
+  "outputDirectory": "attendance-system/frontend/.next",
+  "installCommand": "cd attendance-system/frontend && npm install"
+}
