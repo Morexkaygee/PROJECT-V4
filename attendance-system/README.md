@@ -138,4 +138,4 @@ attendance-system/
 
 ## License
 
-This project is developed as a final year project for the Department of Information Technology , Federal University of Technology, Akure.
+This project is developed as a final year project for the Department of Information Technology, Federal University of Technology, Akure.
