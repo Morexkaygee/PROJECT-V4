@@ -19,11 +19,10 @@ def create_sample_data():
     db = SessionLocal()
     try:
         # Create sample lecturer
-        existing_lecturer = db.query(User).filter(User.email == "lecturer@futa.edu.ng").first()
+        existing_lecturer = db.query(User).filter(User.name == "Dr. John Smith").first()
         if not existing_lecturer:
             lecturer_user = User(
                 name="Dr. John Smith",
-                email="lecturer@futa.edu.ng",
                 hashed_password=get_password_hash("lecturer123"),
                 role="lecturer"
             )
@@ -44,7 +43,7 @@ def create_sample_data():
             
             db.commit()
             print("Sample lecturer and course created:")
-            print("Lecturer: lecturer@futa.edu.ng / lecturer123")
+            print("Lecturer: Dr. John Smith / lecturer123")
             print("Course: CSC301 - Computer Science 301")
         else:
             print("Sample data already exists")

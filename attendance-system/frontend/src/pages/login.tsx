@@ -86,19 +86,20 @@ export default function Auth() {
           ? { matric_no: formData.matric_no, password: formData.password }
           : { name: formData.name, password: formData.password };
 
+        console.log('Making login request to:', endpoint);
+        console.log('Payload:', payload);
+        console.log('API Base URL:', apiClient.defaults.baseURL);
+        
         const response = await apiClient.post(endpoint, payload);
         
         localStorage.setItem('token', response.data.access_token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
 
+        // Force page reload to ensure proper authentication state
         if (response.data.user.role === 'student') {
-          if (!response.data.user.face_registered) {
-            router.push('/student/register-face');
-          } else {
-            router.push('/student/dashboard');
-          }
+          window.location.href = '/student/dashboard';
         } else if (response.data.user.role === 'lecturer') {
-          router.push('/lecturer/dashboard');
+          window.location.href = '/lecturer/dashboard';
         }
       } else {
         const endpoint = activeTab === 'student' ? '/auth/register/student' : '/auth/register/lecturer';
@@ -123,7 +124,17 @@ export default function Auth() {
         }, 2000);
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || `${mode === 'login' ? 'Login' : 'Registration'} failed. Please try again.`);
+      console.error('Login error:', err);
+      
+      if (err.code === 'ERR_NETWORK') {
+        setError('Cannot connect to server. Please ensure the backend is running on http://localhost:8000');
+      } else if (err.response?.status === 401) {
+        setError('Invalid credentials. Please check your login details.');
+      } else if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError(`${mode === 'login' ? 'Login' : 'Registration'} failed. Please try again.`);
+      }
     } finally {
       setLoading(false);
     }

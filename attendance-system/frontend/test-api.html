@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Connection Test</title>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <button onclick="testLogin()">Test Student Login</button>
+    <button onclick="testLecturerLogin()">Test Lecturer Login</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing student login...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/auth/login/student', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        matric_no: 'CSC/2020/001',
+                        password: 'student123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<h3>✅ Student Login Success!</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    result.innerHTML = `<h3>❌ Student Login Failed</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<h3>❌ Network Error</h3><pre>${error.message}</pre>`;
+            }
+        }
+        
+        async function testLecturerLogin() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing lecturer login...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/auth/login/lecturer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        name: 'Dr. Sample Lecturer',
+                        password: 'lecturer123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `<h3>✅ Lecturer Login Success!</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    result.innerHTML = `<h3>❌ Lecturer Login Failed</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<h3>❌ Network Error</h3><pre>${error.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html>

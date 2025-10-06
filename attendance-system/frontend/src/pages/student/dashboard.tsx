@@ -37,18 +37,77 @@ export default function StudentDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [profileResponse, coursesResponse] = await Promise.all([
-        apiClient.get('/students/profile'),
-        apiClient.get('/courses/student')
-      ]);
-
-      setProfile(profileResponse.data);
-      setCourses(coursesResponse.data);
-    } catch (err: any) {
-      if (err.response?.status === 401) {
+      console.log('Fetching dashboard data...');
+      
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log('No token found, redirecting to login');
         router.push('/login');
+        return;
+      }
+      
+      console.log('Token found, making API calls...');
+      
+      // Try to get profile and courses, but handle profile errors gracefully
+      let profileData = null;
+      let coursesData = [];
+      
+      try {
+        const coursesResponse = await apiClient.get('/courses/student');
+        coursesData = coursesResponse.data;
+        console.log('Courses response:', coursesData);
+      } catch (coursesErr) {
+        console.error('Courses API error:', coursesErr);
+      }
+      
+      try {
+        // Try alternative endpoint first
+        const profileResponse = await apiClient.get('/auth/profile');
+        const authProfile = profileResponse.data;
+        
+        // Convert auth profile to student profile format
+        profileData = {
+          id: authProfile.id,
+          name: authProfile.name,
+          matric_no: authProfile.matric_no || 'Unknown',
+          department: authProfile.department || 'Unknown', 
+          level: authProfile.level || 'Unknown',
+          face_registered: authProfile.face_registered || false,
+          course_count: coursesData.length,
+          attendance_count: 0
+        };
+        console.log('Profile response (from auth):', profileData);
+      } catch (profileErr) {
+        console.error('Profile API error:', profileErr);
+        // Create a fallback profile from token data
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        profileData = {
+          id: user.id || 0,
+          name: user.name || 'Student',
+          matric_no: user.matric_no || 'Unknown',
+          department: user.department || 'Unknown',
+          level: user.level || 'Unknown',
+          face_registered: user.face_registered || false,
+          course_count: coursesData.length,
+          attendance_count: 0
+        };
+      }
+      
+      setProfile(profileData);
+      setCourses(coursesData);
+      setError(''); // Clear any previous errors
+    } catch (err: any) {
+      console.error('Dashboard fetch error:', err);
+      
+      if (err.response?.status === 401) {
+        console.log('Unauthorized, redirecting to login');
+        router.push('/login');
+      } else if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
+        setError('Cannot connect to server. Please check if the backend is running.');
       } else {
-        setError('Failed to load dashboard data');
+        const errorMessage = err.response?.data?.detail || err.message || 'Failed to load dashboard data';
+        setError(errorMessage);
       }
     } finally {
       setLoading(false);

@@ -9,6 +9,9 @@ interface Student {
   matric_no: string;
   has_facial_encoding: boolean;
   attendance_count: number;
+  department?: string;
+  level?: string;
+  face_registered?: boolean;
 }
 
 export default function CourseStudents() {
@@ -26,13 +29,20 @@ export default function CourseStudents() {
 
   const fetchCourseStudents = async () => {
     try {
+      console.log('Fetching students for course:', courseId);
       const response = await apiClient.get(`/courses/${courseId}/students`);
+      console.log('Course students response:', response.data);
       setStudents(response.data);
+      setError(''); // Clear any previous errors
     } catch (err: any) {
+      console.error('Course students API error:', err);
       if (err.response?.status === 401) {
         router.push('/login');
+      } else if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
+        setError('Cannot connect to server. Please check if the backend is running.');
       } else {
-        setError('Failed to load course students');
+        const errorMessage = err.response?.data?.detail || err.message || 'Failed to load course students';
+        setError(errorMessage);
       }
     } finally {
       setLoading(false);
@@ -75,8 +85,26 @@ export default function CourseStudents() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-red-700 font-medium">{error}</p>
+          <div className={`mb-6 p-4 rounded-xl ${
+            error.includes('temporarily unavailable') 
+              ? 'bg-blue-50 border border-blue-200' 
+              : 'bg-red-50 border border-red-200'
+          }`}>
+            <div className="flex items-center justify-between">
+              <p className={`font-medium ${
+                error.includes('temporarily unavailable') 
+                  ? 'text-blue-700' 
+                  : 'text-red-700'
+              }`}>{error}</p>
+              {!error.includes('temporarily unavailable') && (
+                <button
+                  onClick={fetchCourseStudents}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Retry
+                </button>
+              )}
+            </div>
           </div>
         )}
 
